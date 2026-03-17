@@ -14,12 +14,10 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <StatsBadges sessions={sessions} />
-      
       <div className="dashboard-grid">
         <div className="dashboard-left">
           <CircularTimer onSessionComplete={handleSessionComplete} />
         </div>
-        
         <div className="dashboard-right">
           <Calendar />
         </div>

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Energy from './pages/Energy';
 import Settings from './pages/Settings';
+import TimeStats from './pages/TimeStats';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="history" element={<History />} />
           <Route path="energy" element={<Energy />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="timestats" element={<TimeStats />} />
         </Route>
       </Routes>
     </Router>

@@ -117,8 +117,8 @@ function Calendar() {
       </div>
 
       <div className="calendar-weekdays">
-        {dayNames.map(day => (
-          <div key={day} className="weekday">{day}</div>
+        {dayNames.map((day, idx) => (
+          <div key={day + idx} className="weekday">{day}</div>
         ))}
       </div>
 

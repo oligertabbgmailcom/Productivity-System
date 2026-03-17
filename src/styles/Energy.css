@@ -3,6 +3,7 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  background: #a3cad6; 
 }
 
 .energy-logger {
@@ -64,7 +65,7 @@
 }
 
 .stat-box {
-  background: var(--bg-tertiary);
+  background: white;
   padding: 1.5rem;
   border-radius: var(--radius-xl);
   text-align: center;
@@ -85,7 +86,7 @@
 .energy-chart {
   margin: 2rem 0;
   padding: 1.5rem;
-  background: var(--bg-tertiary);
+  background: white;
   border-radius: var(--radius-xl);
 }
 

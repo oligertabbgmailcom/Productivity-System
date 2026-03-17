@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 
-function useLocalStorage(key, initialValue) {
-  // Hämta värde från localStorage eller använd initialValue
-  const [storedValue, setStoredValue] = useState(() => {
+function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
@@ -12,7 +11,6 @@ function useLocalStorage(key, initialValue) {
     }
   });
 
-  // Uppdatera localStorage när värdet ändras
   useEffect(() => {
     try {
       window.localStorage.setItem(key, JSON.stringify(storedValue));

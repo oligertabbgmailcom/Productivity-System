@@ -44,7 +44,7 @@
   /* Gradienter */
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
-  --gradient-subtle: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  --gradient-subtle: linear-gradient(135deg, #58698b 0%, #627aaa 100%);
   
   /* Övergångar */
   --transition-fast: 150ms ease-in-out;

@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import useEnergy from '../hooks/useEnergy';
 import '../styles/StatsBadges.css';
+import { useNavigate } from 'react-router-dom';
 
 function StatsBadges({ sessions = [] }) {
   const { logEnergy } = useEnergy();
   const [showEnergyModal, setShowEnergyModal] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const navigate = useNavigate();
   // Läs direkt från localStorage för att säkerställa färsk data
   const getCurrentEnergy = () => {
     try {
@@ -14,6 +16,15 @@ function StatsBadges({ sessions = [] }) {
     } catch {
       return 3;
     }
+  };
+
+  // Session type colors for badges and charts
+  const sessionTypeColors = {
+    'deep-work': '#477ef5',
+    'meeting': '#f39c12',
+    'break': '#e67e22',
+    'learning': '#27ae60',
+    'default': '#bfc7e0'
   };
 
   // Hämtar nuvarande fokusläge från localStorage
@@ -27,19 +38,39 @@ function StatsBadges({ sessions = [] }) {
   };
 
   const [currentEnergy, setCurrentEnergy] = useState(getCurrentEnergy());
-  const [currentMode, setCurrentMode] = useState(getCurrentMode());
+  // ...existing code...
 
   // Beräknar total tid för idag med useMemo
-  const totalTime = useMemo(() => {
-    const today = new Date().toLocaleDateString('en-US');
-    const todaySessions = sessions.filter(
-      session => new Date(session.timestamp).toLocaleDateString('en-US') === today
-    );
-    const totalSeconds = todaySessions.reduce((acc, session) => acc + session.duration, 0);
+  // ...existing code...
+
+  // Total hours logged (only CircularTimer session types)
+  const allowedTypes = ['deep-work', 'meeting', 'break', 'learning'];
+  // Total time in hh:mm format
+  const totalTimeHHMM = useMemo(() => {
+    const totalSeconds = sessions
+      .filter(s => allowedTypes.includes((s.type || '').toLowerCase().replace(/\s+/g, '-')))
+      .reduce((acc, session) => acc + (session.duration || 0), 0);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }, [sessions]);
+
+  // Data för 5-dagars graf
+  const get5DayStats = () => {
+    const grouped = {};
+    sessions.forEach(session => {
+      const day = new Date(session.timestamp).toLocaleDateString('en-US');
+      if (!grouped[day]) grouped[day] = {};
+      if (!grouped[day][session.type]) grouped[day][session.type] = 0;
+      grouped[day][session.type] += session.duration || 0;
+    });
+    const days = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).slice(0, 5).reverse();
+    const sessionTypes = Array.from(new Set(sessions.map(s => s.type)));
+    return { days, sessionTypes, grouped };
+  };
+
+  const [showTimeModal, setShowTimeModal] = useState(false);
+  const [currentMode, setCurrentMode] = useState(getCurrentMode());
 
   // Uppdaterar badges varje sekund för att visa realtidsändringar
   useEffect(() => {
@@ -103,15 +134,29 @@ function StatsBadges({ sessions = [] }) {
     }
   };
 
+  // Only pass allowed session types to TimeStats (normalize type names)
+  function normalizeType(type) {
+    if (!type) return '';
+    return type.toLowerCase().replace(/\s+/g, '-');
+  }
+  const filteredSessions = sessions.filter(s => allowedTypes.includes(normalizeType(s.type)));
+
   return (
     <>
       <div className="stats-badges">
-      <div className="stat-badge">
+      <div className="stat-badge time-badge-clickable" onClick={() => {
+        if (filteredSessions.length > 0) {
+          navigate('/timestats', { state: { sessionData: filteredSessions } });
+        } else {
+          navigate('/timestats'); // fallback: let TimeStats load from localStorage
+        }
+      }} style={{cursor:'pointer'}} title="Click to see breakdown">
         <div className="badge-icon">⏱️</div>
         <div className="badge-content">
           <div className="badge-label">Total Time</div>
-          <div className="badge-value">{totalTime || '0h 0m'}</div>
+          <div className="badge-value">{totalTimeHHMM}</div>
         </div>
+        <div className="badge-hint">Click for details</div>
       </div>
       <div className="stat-badge">
         <div className="badge-icon">🔔</div>
@@ -170,6 +215,79 @@ function StatsBadges({ sessions = [] }) {
         <span className="notification-text">
           Energy level updated! {getRecommendation(currentEnergy)}
         </span>
+      </div>
+    )}
+
+    {/* Modal för total time breakdown */}
+    {showTimeModal && (
+      <div className="energy-modal-overlay" onClick={() => setShowTimeModal(false)}>
+        <div className="energy-modal" onClick={e => e.stopPropagation()} style={{maxWidth:'600px'}}>
+          <h3>Total Hours Logged (Last 5 Days)</h3>
+          <p className="modal-subtitle">Breakdown by session type</p>
+          <div style={{overflowX:'auto'}}>
+            <table style={{width:'100%', borderCollapse:'collapse', marginBottom:'1rem'}}>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  {get5DayStats().sessionTypes.map(type => (
+                    <th key={type}>{type}</th>
+                  ))}
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {get5DayStats().days.map(day => (
+                  <tr key={day}>
+                    <td>{day}</td>
+                    {get5DayStats().sessionTypes.map(type => (
+                      <td key={type} style={{textAlign:'center'}}>
+                        {get5DayStats().grouped[day][type] ? (get5DayStats().grouped[day][type]/3600).toFixed(2) : '-'}
+                      </td>
+                    ))}
+                    <td style={{fontWeight:'bold', textAlign:'center'}}>
+                      {(
+                        Object.values(get5DayStats().grouped[day]).reduce((a, b) => a + b, 0)/3600
+                      ).toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {/* Färgad graf */}
+            <div style={{display:'flex',gap:'0.5rem',alignItems:'flex-end',height:'120px',marginBottom:'1rem'}}>
+              {get5DayStats().days.map(day => {
+                // ...existing code...
+                const types = get5DayStats().sessionTypes;
+                return (
+                  <div key={day} style={{flex:'1',textAlign:'center',display:'flex',flexDirection:'column',justifyContent:'flex-end',height:'100%'}}>
+                    <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-end',height:'100%'}}>
+                      {types.map(type => {
+                        const val = get5DayStats().grouped[day][type] || 0;
+                        if (!val) return null;
+                        return (
+                          <div key={type} style={{height:`${(val/3600)*20}px`,background:sessionTypeColors[type]||sessionTypeColors['default'],borderRadius:'4px',marginBottom:'2px',transition:'height 0.3s',width:'100%'}} title={`${type}: ${(val/3600).toFixed(2)} h`}></div>
+                        );
+                      })}
+                    </div>
+                    <div style={{fontSize:'0.8rem'}}>{day.slice(0,5)}</div>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Legend */}
+            <div style={{display:'flex',gap:'1rem',marginBottom:'0.5rem',flexWrap:'wrap'}}>
+              {get5DayStats().sessionTypes.map(type => (
+                <span key={type} style={{display:'flex',alignItems:'center',gap:'0.3rem',fontSize:'0.9rem'}}>
+                  <span style={{display:'inline-block',width:'14px',height:'14px',background:sessionTypeColors[type]||sessionTypeColors['default'],borderRadius:'3px'}}></span>
+                  {type}
+                </span>
+              ))}
+            </div>
+          </div>
+          <button className="modal-close" onClick={() => setShowTimeModal(false)}>
+            Close
+          </button>
+        </div>
       </div>
     )}
   </>
