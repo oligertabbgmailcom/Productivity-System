@@ -1,9 +1,9 @@
 /* Energy.css */
-.energy-page {
+ .energy-page {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  background: #a3cad6; 
+  background: #f5fafd; /* ultra-light blue for maximum contrast */
 }
 
 .energy-logger {
@@ -277,17 +277,19 @@
   font-weight: 500;
 }
 
-.tip-type {
-  font-size: 0.75rem;
-  color: var(--color-primary);
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-align: center;
-  padding: 0.25rem 0.5rem;
-  background: var(--gradient-subtle);
-  border-radius: var(--radius-sm);
-  align-self: flex-start;
+ .tip-type {
+   font-size: 0.78rem;
+   color: #fff;
+   text-transform: uppercase;
+   font-weight: 700;
+   letter-spacing: 0.5px;
+   text-align: center;
+   padding: 0.25rem 0.5rem;
+   background: #477ef5;
+   border-radius: var(--radius-sm);
+   align-self: flex-start;
+   box-shadow: 0 2px 8px rgba(80,120,200,0.08);
+ }
 }
 
 @media (max-width: 1024px) {

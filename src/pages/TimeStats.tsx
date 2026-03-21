@@ -60,6 +60,8 @@ const TimeStats: React.FC = () => {
     const dateObj = new Date(d);
     return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   });
+  // Only show first, middle, and last date on the x-axis
+  const xAxisTicks = [last30Days[0], last30Days[Math.floor(last30Days.length / 2)], last30Days[last30Days.length - 1]];
   // Ensure the first row is today and the rest follow in descending order
 
 
@@ -90,7 +92,7 @@ const TimeStats: React.FC = () => {
         valueMap[entry.dataKey] = entry.value;
       });
       return (
-        <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: '8px 12px', boxShadow: '0 2px 8px #0001' }}>
+        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: 6, padding: '8px 12px', boxShadow: '0 2px 8px #0001', color: 'var(--text-primary)' }}>
           <div style={{ fontWeight: 500, marginBottom: 2 }}>{label}</div>
           {preferredOrder.map(typeKey => {
             const type = sessionTypes.find(t => t.key === typeKey) || { key: typeKey, label: typeKey };
@@ -120,7 +122,7 @@ const TimeStats: React.FC = () => {
   if (!sessions || sessions.length === 0) {
     return (
       <Card title="Time Stats">
-        <div style={{padding: '2rem', textAlign: 'center', color: '#888'}}>No session data available for the last 30 days.</div>
+        <div style={{padding: '2rem', textAlign: 'center', color: 'var(--text-muted)'}}>No session data available for the last 30 days.</div>
       </Card>
     );
   }
@@ -143,20 +145,21 @@ const TimeStats: React.FC = () => {
           style={{
             width: '50%',
             minWidth: 350,
-            background: 'rgba(255,255,255,0.97)',
+            background: 'var(--bg-secondary)',
             borderRadius: '18px',
-            boxShadow: '0 4px 24px 0 rgba(80,120,200,0.11)',
+            boxShadow: 'var(--shadow-md)',
             padding: '18px 12px 12px 12px',
-            border: '1.5px solid #e3e8f0',
+            border: '1.5px solid var(--border-light)',
             overflowX: 'auto',
             display: 'block',
             fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
             marginTop: '2.5rem',
+            color: 'var(--text-primary)',
           }}
           className="time-stats-chart-responsive"
         >
-          <h4 style={{marginBottom:'0.5rem', fontWeight:700, color:'#2a3550'}}>Last 30 Days</h4>
-          <div style={{fontWeight:'bold',marginBottom:'0.5rem', color:'#477ef5', fontSize:'1.15em'}}>{(() => {
+          <h4 style={{marginBottom:'0.5rem', fontWeight:700, color:'var(--text-primary)'}}>Last 30 Days</h4>
+          <div style={{fontWeight:'bold',marginBottom:'0.5rem', color:'var(--color-primary)', fontSize:'1.15em'}}>{(() => {
             const totalSeconds = stats30.days.reduce((sum, day) => {
               const obj = stats30.grouped[day];
               if (obj !== undefined && obj !== null && typeof obj === 'object') {
@@ -173,14 +176,14 @@ const TimeStats: React.FC = () => {
           })()}</div>
 
           {/* Custom Legend */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', marginBottom: '0.5rem', marginTop: '0.5rem', fontSize: '1.08em' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', marginBottom: '0.5rem', marginTop: '0.5rem', fontSize: '1.08em', color: 'var(--text-primary)' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ width: 16, height: 16, background: '#f5a623', borderRadius: 3, display: 'inline-block', marginRight: 2 }}></span>
               <span style={{ color: '#f5a623', fontWeight: 600 }}><span role="img" aria-label="Break">☕</span> Break</span>
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 16, height: 16, background: '#477ef5', borderRadius: 3, display: 'inline-block', marginRight: 2 }}></span>
-              <span style={{ color: '#477ef5', fontWeight: 600 }}><span role="img" aria-label="Deep Work">🎯</span> Deep Work</span>
+              <span style={{ width: 16, height: 16, background: 'var(--color-primary)', borderRadius: 3, display: 'inline-block', marginRight: 2 }}></span>
+              <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}><span role="img" aria-label="Deep Work">🎯</span> Deep Work</span>
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ width: 16, height: 16, background: '#f5a623', borderRadius: 3, display: 'inline-block', marginRight: 2 }}></span>
@@ -203,30 +206,30 @@ const TimeStats: React.FC = () => {
               })}
               margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
             >
-              <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
+              <CartesianGrid stroke="var(--border-light)" strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
-                stroke="#181c2a"
+                stroke="var(--text-primary)"
                 tick={{
                   fontSize: 14,
                   fontWeight: 500,
                   angle: -35,
                   textAnchor: 'end',
                   fontFamily: 'inherit',
-                  fill: '#181c2a',
+                  fill: 'var(--text-primary)',
                 }}
                 interval={0}
                 axisLine={false}
                 tickLine={false}
-                ticks={last30Days}
+                ticks={xAxisTicks}
               />
               <YAxis
-                stroke="#181c2a"
+                stroke="var(--text-primary)"
                 tick={{
                   fontSize: 15,
                   fontWeight: 600,
                   fontFamily: 'inherit',
-                  fill: '#181c2a',
+                  fill: 'var(--text-primary)',
                 }}
                 axisLine={false}
                 tickLine={false}
@@ -254,19 +257,20 @@ const TimeStats: React.FC = () => {
         style={{
           width: '50%',
           minWidth: 350,
-          background: 'rgba(255,255,255,0.97)',
+          background: 'var(--bg-secondary)',
           borderRadius: '18px',
-          boxShadow: '0 4px 24px 0 rgba(80,120,200,0.11)',
+          boxShadow: 'var(--shadow-md)',
           padding: '18px 12px 12px 12px',
-          border: '1.5px solid #e3e8f0',
+          border: '1.5px solid var(--border-light)',
           overflowX: 'auto',
           display: 'block',
           fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
           marginTop: '2.5rem',
+          color: 'var(--text-primary)',
         }}
         className="time-stats-table-responsive"
       >
-        <h4 style={{margin: '0 0 12px 0', fontWeight: 700, fontSize: '1.13em', color: '#2a3550', letterSpacing: '0.01em'}}>30-Day Session Breakdown</h4>
+        <h4 style={{margin: '0 0 12px 0', fontWeight: 700, fontSize: '1.13em', color: 'var(--text-primary)', letterSpacing: '0.01em'}}>30-Day Session Breakdown</h4>
         <div style={{width:'100%', overflowX:'auto'}}>
           <table style={{
             borderCollapse: 'separate',
@@ -276,13 +280,14 @@ const TimeStats: React.FC = () => {
             fontSize: '0.98em',
             background: 'transparent',
             borderRadius: '14px',
-            boxShadow: '0 1px 6px 0 rgba(80,120,200,0.06)',
+            boxShadow: 'var(--shadow-sm)',
             overflow: 'hidden',
             border: 'none',
+            color: 'var(--text-primary)',
           }}>
             <thead>
               <tr>
-                <th style={{ position: 'sticky', left: 0, background: '#fafdff', zIndex: 2, minWidth: 80, textAlign: 'left', fontWeight: 700, color: '#2a3550', fontSize: '1em', borderTopLeftRadius: 14, borderBottom: '2px solid #e3e8f0', letterSpacing: '0.01em' }}>Date</th>
+                <th style={{ position: 'sticky', left: 0, background: 'var(--bg-primary)', zIndex: 2, minWidth: 80, textAlign: 'left', fontWeight: 700, color: 'var(--text-primary)', fontSize: '1em', borderTopLeftRadius: 14, borderBottom: '2px solid var(--border-light)', letterSpacing: '0.01em' }}>Date</th>
                 {preferredOrder.map((typeKey, i) => {
                   let icon = null, color = '#2a3550', label = '';
                   if (typeKey === 'break') {
@@ -305,19 +310,18 @@ const TimeStats: React.FC = () => {
                     label = (typeKey.charAt(0).toUpperCase() + typeKey.slice(1).replace('-', ' '));
                   }
                   return (
-                    <th key={typeKey} style={{ textAlign: 'center', fontWeight: 600, color, fontSize: '1.08em', minWidth: 100, background:'#fafdff', borderBottom: '2px solid #e3e8f0', letterSpacing: '0.01em' }}>
+                    <th key={typeKey} style={{ textAlign: 'center', fontWeight: 600, color, fontSize: '1.08em', minWidth: 100, background:'var(--bg-primary)', borderBottom: '2px solid var(--border-light)', letterSpacing: '0.01em' }}>
                       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                         {icon} {label}
                       </span>
                     </th>
                   );
                 })}
-                <th style={{ textAlign: 'center', fontWeight: 700, color: '#204ecf', fontSize: '1.08em', minWidth: 110, background:'#fafdff', borderBottom: '2px solid #e3e8f0', letterSpacing: '0.01em' }}>Total Time</th>
+                <th style={{ textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: '1.08em', minWidth: 110, background:'var(--bg-primary)', borderBottom: '2px solid var(--border-light)', letterSpacing: '0.01em' }}>Total Time</th>
               </tr>
             </thead>
             <tbody>
               {last30DaysRaw.map((day, rowIdx) => {
-                // Calculate total time for the day
                 const totalSeconds = preferredOrder.reduce((sum, typeKey) => {
                   const type = sessionTypes.find(t => t.key === typeKey) || { key: typeKey };
                   const value = (grouped[day] && grouped[day][type.key]) ? grouped[day][type.key] : 0;
@@ -325,9 +329,11 @@ const TimeStats: React.FC = () => {
                 }, 0);
                 const totalHours = Math.floor(totalSeconds / 3600);
                 const totalMinutes = Math.floor((totalSeconds % 3600) / 60);
+                // Alternate row backgrounds using CSS variables for dark mode
+                const rowBg = rowIdx % 2 === 0 ? 'var(--bg-primary)' : 'var(--bg-tertiary)';
                 return (
-                  <tr key={day} style={{ background: rowIdx % 2 === 0 ? '#fafdff' : '#f3f7fb', transition: 'background 0.2s' }}>
-                    <td style={{ position: 'sticky', left: 0, background: '#fafdff', zIndex: 1, fontWeight: 700, color: '#2a3550', minWidth: 80, borderRight: '1px solid #e3e8f0' }}>{last30Days[rowIdx]}</td>
+                  <tr key={day} style={{ background: rowBg, transition: 'background 0.2s' }}>
+                    <td style={{ position: 'sticky', left: 0, background: 'var(--bg-primary)', zIndex: 1, fontWeight: 700, color: 'var(--text-primary)', minWidth: 80, borderRight: '1px solid var(--border-light)' }}>{last30Days[rowIdx]}</td>
                     {preferredOrder.map((typeKey, colIdx) => {
                       const type = sessionTypes.find(t => t.key === typeKey) || { key: typeKey };
                       const value = (grouped[day] && grouped[day][type.key]) ? grouped[day][type.key] : 0;
@@ -336,7 +342,7 @@ const TimeStats: React.FC = () => {
                       return (
                         <td key={colIdx} style={{
                           textAlign: 'center',
-                          color: value ? '#2a3550' : '#b0b8c9',
+                          color: value ? 'var(--text-primary)' : 'var(--text-muted)',
                           fontWeight: 600,
                           padding: '7px 2px',
                           border: 'none',
@@ -345,14 +351,14 @@ const TimeStats: React.FC = () => {
                           cursor: value ? 'pointer' : 'default',
                           transition: 'background 0.2s',
                         }}
-                          onMouseOver={e => { if (value) (e.currentTarget as HTMLElement).style.background = '#eaf2ff'; }}
+                          onMouseOver={e => { if (value) (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)'; }}
                           onMouseOut={e => { if (value) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                         >
                           {value ? `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}` : '-'}
                         </td>
                       );
                     })}
-                    <td style={{ textAlign: 'center', color: '#204ecf', fontWeight: 700, fontSize: '1.08em', minWidth: 110, background: 'transparent', border: 'none' }}>
+                    <td style={{ textAlign: 'center', color: 'var(--color-primary)', fontWeight: 700, fontSize: '1.08em', minWidth: 110, background: 'transparent', border: 'none' }}>
                       {totalSeconds > 0 ? `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}` : '-'}
                     </td>
                   </tr>

@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useEnergy from '../hooks/useEnergy';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import '../styles/Energy.css';
 
 function Energy() {
+  useEffect(() => {
+    // Set body background color for Energy page
+    document.body.style.background = '#f5fafd';
+    return () => {
+      // Reset to default when leaving Energy page
+      document.body.style.background = '';
+    };
+  }, []);
   const { energyLogs, logEnergy, getAverageEnergy } = useEnergy();
   const [selectedLevel, setSelectedLevel] = useState(null);
 

@@ -36,7 +36,7 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   touch-action: manipulation;
-  background-color: var(--bg-primary);
+  background-color: #eaf4fb; /* lighter blue for energy page and all pages */
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
