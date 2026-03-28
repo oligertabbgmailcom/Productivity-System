@@ -1,8 +1,21 @@
 import useLocalStorage from './useLocalStorage';
 
+/**
+ * Custom React hook for tracking and logging energy levels.
+ *
+ * @returns {{
+ *   energyLogs: Array,
+ *   logEnergy: (level: number) => void,
+ *   getAverageEnergy: (days?: number) => number|string
+ * }} Object with energy logs, log function, and average calculator.
+ */
 function useEnergy() {
   const [energyLogs, setEnergyLogs] = useLocalStorage('energyLogs', []);
 
+  /**
+   * Logs a new energy level entry.
+   * @param {number} level - The energy level to log (1-5).
+   */
   const logEnergy = (level) => {
     const newLog = {
       id: Date.now(),
@@ -20,6 +33,11 @@ function useEnergy() {
     }
   };
 
+  /**
+   * Calculates the average energy level over a number of days.
+   * @param {number} [days=7] - Number of days to include in the average.
+   * @returns {number|string} The average energy level, or 0 if no logs.
+   */
   const getAverageEnergy = (days = 7) => {
     const now = new Date();
     const recentLogs = energyLogs.filter(log => {
